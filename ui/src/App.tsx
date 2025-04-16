@@ -1,14 +1,23 @@
-import { useState, useCallback } from 'react'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Skeleton } from "@/components/ui/skeleton"
+import { useState, useCallback } from "react";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Define API base URL from environment variables with fallback
+const API_URL = import.meta.env.VITE_API_URL || "/api";
 
 function App() {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [tableName, setTableName] = useState('');
-  const [query, setQuery] = useState('');
+  const [tableName, setTableName] = useState("");
+  const [query, setQuery] = useState("");
   const [queryResponse, setQueryResponse] = useState<string | null>(null);
   const [isQuerying, setIsQuerying] = useState(false);
 
@@ -32,21 +41,21 @@ function App() {
 
     setUploading(true);
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('tableName', tableName);
+    formData.append("file", file);
+    formData.append("tableName", tableName);
 
     try {
-      const response = await fetch('http://localhost:3000/upload-csv', {
-        method: 'POST',
+      const response = await fetch(`${API_URL}/upload-csv`, {
+        method: "POST",
         body: formData,
       });
 
-      if (!response.ok) throw new Error('Upload failed');
-      
+      if (!response.ok) throw new Error("Upload failed");
+
       setFile(null);
-      setTableName('');
+      setTableName("");
     } catch (error) {
-      console.error('Upload error:', error);
+      console.error("Upload error:", error);
     } finally {
       setUploading(false);
     }
@@ -54,23 +63,23 @@ function App() {
 
   const handleQuery = async () => {
     if (!query) return;
-    
+
     setIsQuerying(true);
     try {
-      const response = await fetch('http://localhost:3000/query', {
-        method: 'POST',
+      const response = await fetch(`${API_URL}/query`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ message: query }),
       });
 
-      if (!response.ok) throw new Error('Query failed');
-      
+      if (!response.ok) throw new Error("Query failed");
+
       const data = await response.json();
       setQueryResponse(data.response);
     } catch (error) {
-      console.error('Query error:', error);
+      console.error("Query error:", error);
     } finally {
       setIsQuerying(false);
     }
@@ -96,12 +105,12 @@ function App() {
                 placeholder="Enter table name"
               />
             </div>
-            
+
             <div
               onDrop={onDrop}
               onDragOver={(e) => e.preventDefault()}
               className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary cursor-pointer"
-              onClick={() => document.getElementById('file-upload')?.click()}
+              onClick={() => document.getElementById("file-upload")?.click()}
             >
               <input
                 type="file"
@@ -111,17 +120,19 @@ function App() {
                 onChange={handleFileSelect}
               />
               <Label className="cursor-pointer block">
-                {file ? file.name : 'Drag and drop a CSV file here, or click to select'}
+                {file
+                  ? file.name
+                  : "Drag and drop a CSV file here, or click to select"}
               </Label>
             </div>
           </CardContent>
           <CardFooter>
-            <Button 
-              onClick={handleUpload} 
+            <Button
+              onClick={handleUpload}
               disabled={!file || !tableName || uploading}
               className="w-full"
             >
-              {uploading ? 'Uploading...' : 'Upload CSV'}
+              {uploading ? "Uploading..." : "Upload CSV"}
             </Button>
           </CardFooter>
         </Card>
@@ -142,11 +153,7 @@ function App() {
                 className="flex-1 px-3 py-2 border rounded-md"
                 placeholder="Ask a question about your data..."
               />
-              <Button 
-                onClick={handleQuery}
-              >
-                Ask
-              </Button>
+              <Button onClick={handleQuery}>Ask</Button>
             </div>
 
             {isQuerying && (
@@ -157,7 +164,7 @@ function App() {
 
             {queryResponse && !isQuerying && (
               <div className="mt-4 p-4 bg-muted rounded-md">
-                {queryResponse.split('\n').map((line, index) => (
+                {queryResponse.split("\n").map((line, index) => (
                   <p key={index}>{line}</p>
                 ))}
               </div>
@@ -166,7 +173,7 @@ function App() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
