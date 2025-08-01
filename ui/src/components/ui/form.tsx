@@ -13,7 +13,7 @@ import {
 import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label"
 
-const Form = FormProvider
+const FormRoot = FormProvider
 
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
@@ -44,11 +44,15 @@ const useFormField = () => {
   const itemContext = React.useContext(FormItemContext)
   const { getFieldState, formState } = useFormContext()
 
-  const fieldState = getFieldState(fieldContext.name, formState)
-
   if (!fieldContext) {
     throw new Error("useFormField should be used within <FormField>")
   }
+
+  if (!itemContext) {
+    throw new Error("useFormField should be used within <FormItem>")
+  }
+
+  const fieldState = React.useMemo(() => getFieldState(fieldContext.name, formState), [fieldContext.name, formState])
 
   const { id } = itemContext
 
@@ -166,7 +170,7 @@ FormMessage.displayName = "FormMessage"
 
 export {
   useFormField,
-  Form,
+  FormRoot as Form,
   FormItem,
   FormLabel,
   FormControl,
